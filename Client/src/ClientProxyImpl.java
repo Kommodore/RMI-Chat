@@ -10,13 +10,14 @@ public class ClientProxyImpl implements ClientProxy, ActionListener{
 
 	public ClientProxyImpl(){
 		String serverUrl = "rmi://localhost:1099/ChatServer";
+		ChatServer stub;
 		
 		loginWindow = new LoginWindow();
 		loginWindow.addLoginAction(this);
 	
 
 		try {
-			ChatServer stub = (ChatServer)Naming.lookup(serverUrl);
+			stub = (ChatServer)Naming.lookup(serverUrl);
 			
 		} catch (NotBoundException e) {
 			System.err.println("Remote object not found. Is the server started?");
