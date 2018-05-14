@@ -1,13 +1,14 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
 import gui.*;
 
-public class ClientProxyImpl implements ClientProxy, ActionListener, Serializable {
+public class ClientProxyImpl extends UnicastRemoteObject implements ClientProxy, ActionListener{
 	
 	private transient LoginWindow loginWindow;
 	private ChatWindow chatWindow;
@@ -15,7 +16,7 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 	private String myUsername;
 	private ChatProxy irgendwas;
 
-	private ClientProxyImpl(){
+	private ClientProxyImpl() throws RemoteException {
 		String serverUrl = "rmi://localhost:1099/ChatServer";
 		
 		loginWindow = new LoginWindow();
@@ -38,11 +39,10 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 
 	@Override
 	public void receiveMessage(String username, String message) throws RemoteException {
-		System.out.println(this);
 		if(chatWindow == null){
 			System.out.println("ChatWindow ist null");
 		} else {
-			chatWindow.addChatMsg(username, message);
+			chatWindow.addChatMsg(message);
 		}
 	}
 	
@@ -68,8 +68,7 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 			String message1234 = chatWindow.getChatMsg();
 			try {
 				if(irgendwas != null){
-					System.out.println(this);
-					irgendwas.sendMessage(message1234);
+					irgendwas.sendMessage("<" + myUsername + ">: "+message1234);
 				} else {
 					System.out.println("Nullpointer");
 				}
@@ -81,6 +80,10 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 	}
 
 	public static void main(String[] args) {
-		new ClientProxyImpl();
+		try {
+			new ClientProxyImpl();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
@@ -13,7 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class ChatWindow implements Serializable {
+public class ChatWindow{
 
 	private JFrame window;
 	
@@ -45,6 +44,7 @@ public class ChatWindow implements Serializable {
 		GridBagConstraints c = new GridBagConstraints();
 		window.setLayout(new GridBagLayout());
 		
+		System.out.println("Neu erstellt!!!!!!!!!!!!!!!!!");
 		chat = new JTextArea();
 		chat.setPreferredSize(new Dimension(600, 600));
 		chat.setEditable(false);
@@ -72,8 +72,8 @@ public class ChatWindow implements Serializable {
 		return m;
 	}
 
-	public void addChatMsg(String username, String m) {
+	public void addChatMsg(String m) {
 		System.out.println("Message2 ist "+m);
-		chat.setText(chat.getText() + "<" + username + ">: " + m + "\n");
+		chat.setText(chat.getText() + m + "\n");
 	}
 }
