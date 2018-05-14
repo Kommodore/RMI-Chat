@@ -2,22 +2,35 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 
 public class ChatServerImpl implements ChatServer, ChatProxy{
+	private HashMap<String, ClientProxy> clients = new HashMap<>();
 	
 	@Override
 	public ChatProxy subscribeUser(String username, ClientProxy handle) throws RemoteException {
+		clients.put(username, handle);
+		System.out.println(username+" registered.");
 		return null;
 	}
 	
 	@Override
 	public ChatProxy unsubscribeUser(String username) throws RemoteException {
+		clients.remove(username);
+		System.out.println(username+" unregistered.");
 		return null;
 	}
 	
 	@Override
-	public void sendMessage(String message) throws RemoteException {
-	
+	public void sendMessage(String message){
+		clients.forEach((s, clientProxy) -> {
+			try {
+				clientProxy.receiveMessage(s, message);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			
+		});
 	}
 	
 	public static void main(String[] args) {
