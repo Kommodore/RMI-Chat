@@ -17,7 +17,7 @@ public class ChatWindow implements Serializable {
 
 	private JFrame window;
 	
-	private JTextArea chat;
+	public JTextArea chat;
 	private JTextField msg;
 	
 	public ChatWindow() {

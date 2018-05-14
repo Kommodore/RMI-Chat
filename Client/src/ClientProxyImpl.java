@@ -9,7 +9,7 @@ import gui.*;
 
 public class ClientProxyImpl implements ClientProxy, ActionListener, Serializable {
 	
-	private LoginWindow loginWindow;
+	private transient LoginWindow loginWindow;
 	private ChatWindow chatWindow;
 	private ChatServer stub;
 	private String myUsername;
@@ -38,11 +38,11 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 
 	@Override
 	public void receiveMessage(String username, String message) throws RemoteException {
+		System.out.println(this);
 		if(chatWindow == null){
 			System.out.println("ChatWindow ist null");
 		} else {
 			chatWindow.addChatMsg(username, message);
-			System.out.println("message ist: "+message);
 		}
 	}
 	
@@ -68,6 +68,7 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 			String message1234 = chatWindow.getChatMsg();
 			try {
 				if(irgendwas != null){
+					System.out.println(this);
 					irgendwas.sendMessage(message1234);
 				} else {
 					System.out.println("Nullpointer");

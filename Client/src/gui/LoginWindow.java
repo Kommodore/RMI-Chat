@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class LoginWindow implements Serializable {
+public class LoginWindow{
 
 	private JFrame window;
 
