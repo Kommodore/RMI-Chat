@@ -38,7 +38,12 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 
 	@Override
 	public void receiveMessage(String username, String message) throws RemoteException {
-		chatWindow.addChatMsg(username, message);
+		if(chatWindow == null){
+			System.out.println("ChatWindow ist null");
+		} else {
+			chatWindow.addChatMsg(username, message);
+			System.out.println("message ist: "+message);
+		}
 	}
 	
 	@Override
@@ -49,22 +54,21 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 			System.out.println("NAME: " + loginWindow.getName());
 			System.out.println("PASSWORD: " + loginWindow.getPassword());
 			myUsername = loginWindow.getName();
-			try {
-				irgendwas = stub.subscribeUser(myUsername, this);
-			} catch (RemoteException e1) {
-				e1.printStackTrace();
-			}
-			
 			
 			loginWindow.killWindow();
 			chatWindow = new ChatWindow();
 			chatWindow.addChatAction(this);
 			
+			try {
+				irgendwas = stub.subscribeUser(myUsername, this);
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
 		}else if(e.getActionCommand().equals("SETMSG")){
-			chatWindow.addChatMsg(myUsername, chatWindow.getChatMsg());
+			String message1234 = chatWindow.getChatMsg();
 			try {
 				if(irgendwas != null){
-					irgendwas.sendMessage(chatWindow.getChatMsg());
+					irgendwas.sendMessage(message1234);
 				} else {
 					System.out.println("Nullpointer");
 				}

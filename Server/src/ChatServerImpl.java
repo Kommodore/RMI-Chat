@@ -11,14 +11,14 @@ public class ChatServerImpl implements ChatServer, ChatProxy{
 	public ChatProxy subscribeUser(String username, ClientProxy handle) throws RemoteException {
 		clients.put(username, handle);
 		System.out.println(username+" registered.");
-		return null;
+		return this;
 	}
 	
 	@Override
 	public ChatProxy unsubscribeUser(String username) throws RemoteException {
 		clients.remove(username);
 		System.out.println(username+" unregistered.");
-		return null;
+		return this;
 	}
 	
 	@Override

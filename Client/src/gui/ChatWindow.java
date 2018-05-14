@@ -73,6 +73,7 @@ public class ChatWindow implements Serializable {
 	}
 
 	public void addChatMsg(String username, String m) {
+		System.out.println("Message2 ist "+m);
 		chat.setText(chat.getText() + "<" + username + ">: " + m + "\n");
 	}
 }
