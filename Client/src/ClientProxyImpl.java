@@ -11,9 +11,8 @@ public class ClientProxyImpl implements ClientProxy, ActionListener {
 	private LoginWindow loginWindow;
 	private ChatWindow chatWindow;
 	private ChatServer stub;
-	private String username;
+	private String myUsername;
 	private ChatProxy irgendwas;
-	private ClientProxy bla;
 
 	private ClientProxyImpl(){
 		String serverUrl = "rmi://localhost:1099/ChatServer";
@@ -48,9 +47,9 @@ public class ClientProxyImpl implements ClientProxy, ActionListener {
 			System.out.println("IP ADDRESS: " + loginWindow.getIpAddr());
 			System.out.println("NAME: " + loginWindow.getName());
 			System.out.println("PASSWORD: " + loginWindow.getPassword());
-			username = loginWindow.getName();
+			myUsername = loginWindow.getName();
 			try {
-				irgendwas = stub.subscribeUser(username, bla);
+				irgendwas = stub.subscribeUser(myUsername, this);
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
@@ -61,7 +60,7 @@ public class ClientProxyImpl implements ClientProxy, ActionListener {
 			chatWindow.addChatAction(this);
 			
 		}else if(e.getActionCommand().equals("SETMSG")){
-			chatWindow.addChatMsg(chatWindow.getChatMsg());
+			chatWindow.addChatMsg(myUsername, chatWindow.getChatMsg());
 			try {
 				irgendwas.sendMessage(chatWindow.getChatMsg());
 			} catch (RemoteException e1) {
