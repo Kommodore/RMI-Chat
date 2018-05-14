@@ -1,4 +1,4 @@
-package vs_chat.me.gui;
+package gui;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

@@ -1,21 +1,26 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import gui.*;
 
-public class ClientProxyImpl implements ClientProxy, ActionListener{
+public class ClientProxyImpl implements ClientProxy, ActionListener {
 	
 	private LoginWindow loginWindow;
 	private ChatWindow chatWindow;
+	private ChatServer stub;
+	private String username;
+	private ChatProxy irgendwas;
+	private ClientProxy bla;
 
-	public ClientProxyImpl(){
+	private ClientProxyImpl(){
 		String serverUrl = "rmi://localhost:1099/ChatServer";
-		ChatServer stub;
 		
 		loginWindow = new LoginWindow();
 		loginWindow.addLoginAction(this);
-	
-
+		
 		try {
 			stub = (ChatServer)Naming.lookup(serverUrl);
 			
@@ -33,7 +38,7 @@ public class ClientProxyImpl implements ClientProxy, ActionListener{
 
 	@Override
 	public void receiveMessage(String username, String message) throws RemoteException {
-	
+		chatWindow.addChatMsg(username, message);
 	}
 	
 	@Override
@@ -43,13 +48,25 @@ public class ClientProxyImpl implements ClientProxy, ActionListener{
 			System.out.println("IP ADDRESS: " + loginWindow.getIpAddr());
 			System.out.println("NAME: " + loginWindow.getName());
 			System.out.println("PASSWORD: " + loginWindow.getPassword());
-		
+			username = loginWindow.getName();
+			try {
+				irgendwas = stub.subscribeUser(username, bla);
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
+			
+			
 			loginWindow.killWindow();
 			chatWindow = new ChatWindow();
 			chatWindow.addChatAction(this);
 			
 		}else if(e.getActionCommand().equals("SETMSG")){
 			chatWindow.addChatMsg(chatWindow.getChatMsg());
+			try {
+				irgendwas.sendMessage(chatWindow.getChatMsg());
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 
