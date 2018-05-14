@@ -62,7 +62,7 @@ public class ChatWindow{
 		return m;
 	}
 
-	public void addChatMsg(String m) {
-		chat.setText(chat.getText() + m + "\n");
+	public void addChatMsg(String username, String m) {
+		chat.setText(chat.getText() + "<" + username + ">: " + m + "\n");
 	}
 }
