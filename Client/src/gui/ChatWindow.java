@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 public class ChatWindow{
 
@@ -18,6 +19,8 @@ public class ChatWindow{
 	private JTextField msg;
 	
 	public ChatWindow() {
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
 		window = new JFrame();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);

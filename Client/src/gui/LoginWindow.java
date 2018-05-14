@@ -20,6 +20,8 @@ public class LoginWindow {
 	private JButton login;
 
 	public LoginWindow() {
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
 		window = new JFrame();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
@@ -88,21 +90,21 @@ public class LoginWindow {
 	public void addLoginAction(ActionListener al) {
 		login.addActionListener(al);
 	}
-	
+
 	public void killWindow() {
 		window.dispose();
 	}
-	
+
 	public String getIpAddr() {
 		return ipAddr.getText();
 	}
-	
+
 	public String getName() {
 		return name.getText();
 	}
-	
+
 	public String getPassword() {
 		return password.getText();
 	}
-	
+
 }
