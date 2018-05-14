@@ -3,16 +3,18 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-public class ClientProxyImpl implements ClientProxy{
+public class ClientProxyImpl implements ClientProxy, ActionListener{
 	
-	@Override
-	public void receiveMessage(String username, String message) throws RemoteException {
-	
-	}
-	
-	public static void main(String[] args) {
+	private LoginWindow loginWindow;
+	private ChatWindow chatWindow;
+
+	public ClientProxyImpl(){
 		String serverUrl = "rmi://localhost:1099/ChatServer";
 		
+		loginWindow = new LoginWindow();
+		loginWindow.addLoginAction(this);
+	
+
 		try {
 			ChatServer stub = (ChatServer)Naming.lookup(serverUrl);
 			
@@ -26,5 +28,31 @@ public class ClientProxyImpl implements ClientProxy{
 			System.err.println("Please check if the server and registry are running.");
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void receiveMessage(String username, String message) throws RemoteException {
+	
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getActionCommand().equals("LOGIN")) {
+			
+			System.out.println("IP ADDRESS: " + loginWindow.getIpAddr());
+			System.out.println("NAME: " + loginWindow.getName());
+			System.out.println("PASSWORD: " + loginWindow.getPassword());
+		
+			loginWindow.killWindow();
+			chatWindow = new ChatWindow();
+			chatWindow.addChatAction(this);
+			
+		}else if(e.getActionCommand().equals("SETMSG")){
+			chatWindow.addChatMsg(chatWindow.getChatMsg());
+		}
+	}
+
+	public static void main(String[] args) {
+		new ClientProxyImpl();
 	}
 }
