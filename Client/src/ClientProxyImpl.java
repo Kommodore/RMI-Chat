@@ -63,7 +63,12 @@ public class ClientProxyImpl implements ClientProxy, ActionListener, Serializabl
 		}else if(e.getActionCommand().equals("SETMSG")){
 			chatWindow.addChatMsg(myUsername, chatWindow.getChatMsg());
 			try {
-				irgendwas.sendMessage(chatWindow.getChatMsg());
+				if(irgendwas != null){
+					irgendwas.sendMessage(chatWindow.getChatMsg());
+				} else {
+					System.out.println("Nullpointer");
+				}
+				
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
