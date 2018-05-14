@@ -1,12 +1,13 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import gui.*;
 
-public class ClientProxyImpl implements ClientProxy, ActionListener {
+public class ClientProxyImpl implements ClientProxy, ActionListener, Serializable {
 	
 	private LoginWindow loginWindow;
 	private ChatWindow chatWindow;

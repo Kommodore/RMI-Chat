@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
@@ -12,7 +13,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class ChatWindow{
+public class ChatWindow implements Serializable {
 
 	private JFrame window;
 	
