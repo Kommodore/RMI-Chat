@@ -4,17 +4,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 @WebServlet(name = "ClientServlet")
 public class ClientServlet extends HttpServlet implements ClientProxy{
-	private ChatServer stub;
 	private ChatProxy proxyObject = null;
+	private ClientProxyImpl client;
 	private String username = "";
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -23,23 +18,30 @@ public class ClientServlet extends HttpServlet implements ClientProxy{
 		
 		if(action.equals("subscribe")){
 			try {
+				client.connect(request.getParameter("server_ip"));
 				username = request.getParameter("username");
-				proxyObject = stub.subscribeUser(username, this);
+				proxyObject = client.stub.subscribeUser(username, client);
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 				response.sendError(403);
 			} catch (NullPointerException e1){
+				e1.printStackTrace();
 				response.sendError(420);
 			}
 		}
 		
 		if(action.equals("unsubscribe")){
-			try{
-				stub.unsubscribeUser(username);
-				proxyObject = null;
-			} catch(RemoteException e1){
-				e1.printStackTrace();
+			if(client.stub == null){
 				response.sendError(500);
+			} else {
+				try{
+					client.stub.unsubscribeUser(username);
+					proxyObject = null;
+					System.out.println("User unsubscribed");
+				} catch(RemoteException e1){
+					e1.printStackTrace();
+					response.sendError(500);
+				}
 			}
 		}
 		
@@ -51,14 +53,12 @@ public class ClientServlet extends HttpServlet implements ClientProxy{
 					e1.printStackTrace();
 					response.sendError(420);
 				}
+			} else if(client.stub == null) {
+				response.sendError(500);
 			} else {
 				response.sendError(401);
 			}
 		}
-	}
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
 	}
 	
 	@Override
@@ -69,17 +69,9 @@ public class ClientServlet extends HttpServlet implements ClientProxy{
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		String serverUrl = "rmi://localhost:1099/ChatServer";
-		
 		try {
-			Registry registry = LocateRegistry.getRegistry();
-			stub = (ChatServer)registry.lookup(serverUrl);
-			
-		} catch (NotBoundException e) {
-			System.err.println("Remote object not found. Is the server started?");
-			e.printStackTrace();
+			client = new ClientProxyImpl();
 		} catch (RemoteException e) {
-			System.err.println("Please check if the server and registry are running.");
 			e.printStackTrace();
 		}
 	}

@@ -64,7 +64,6 @@ section#error h1{
 section#login{
 	align-items: center;
 	color: #86b8da;
-	display: none;
 	width: 30%;
 }
 
@@ -101,6 +100,7 @@ section#login input[type="submit"]:hover, section#login input[type="submit"]:act
 }
 
 section#chat{
+	display: none;
 	height: 80%;
 	margin-top: 5%;
 	position: relative;

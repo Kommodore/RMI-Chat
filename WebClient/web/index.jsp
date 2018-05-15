@@ -15,8 +15,8 @@
 			<section id="login">
 				<h1>Login</h1>
 				<form action="" method="post" id="login-form">
-					<input type="text" id="server" name="server" placeholder="Server">
-					<input type="text" id="username" name="username" placeholder="Username">
+					<input type="text" id="server" name="server" placeholder="Server" required>
+					<input type="text" id="username" name="username" placeholder="Username" required>
 					<input type="submit" value="Verbinden...">
 				</form>
 			</section>
@@ -33,8 +33,8 @@
 						</div>
 					</div>
 					<div id="message-box">
-						<form action="" method="post">
-							<input type="text" id="new-message" title="New message">
+						<form action="" method="post" id="message-form">
+							<input type="text" id="new-message" title="New message" required>
 							<div class="send-button">
 								<input type="submit" id="send-message" value="">
 							</div>
@@ -51,6 +51,7 @@
 		<script>
 			$(document).ready(function($){
 			    var username = "";
+			    var server_ip = "";
 			    var spinner = $("div#loading-spinner");
 			    var error = $("section#error");
 			    $("a.error-close").on("click", function(){
@@ -60,14 +61,18 @@
 			   $("#login-form").on("submit", function(event){
 			       event.preventDefault();
 			       username = $("section#login input#username").val();
+			       server_ip = $("input#server").val();
                    $("section#login :input").attr("disabled", true);
 				   spinner.fadeIn("fast");
+				   console.log("Username: "+username);
+				   console.log("Server IP: "+server_ip);
 			       $.post('/api', {
 			           action: "subscribe",
-				       username: username
+				       username: username,
+				       server_ip: server_ip
 			       }).done(function(){
 			           $(".my-username").text(username);
-			           $(".server-ip").text($("input#server").val());
+                       $(".server-ip").text(server_ip);
 			           $("section#login").fadeOut("fast");
 			           $("section#chat").fadeIn("fast", function(){
                            spinner.fadeOut("fast");
@@ -83,7 +88,7 @@
 
 			   $("#chat-logout").on("click", function(){
 			       $.post('/api', {
-			           action: "logout"
+			           action: "unsubscribe"
 			       }).done(function(){
                        $("section#chat").fadeOut("fast");
                        $('section#login input[type="text"]').val("");
@@ -102,7 +107,7 @@
                 $("#message-form").on("submit", function(event){
                     event.preventDefault();
                     $.post('/api', {
-                        action: "sendMessage",
+                        action: "send_message",
 	                    message: $("div#message-box input#new-message").val()
                     }).done(function(){
                         $("div#message-box input#new-message").val("");
