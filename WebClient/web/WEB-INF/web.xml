@@ -6,6 +6,7 @@
     <servlet>
         <servlet-name>API</servlet-name>
         <servlet-class>ClientServlet</servlet-class>
+        <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
         <servlet-name>API</servlet-name>

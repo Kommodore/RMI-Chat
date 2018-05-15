@@ -54,6 +54,14 @@
 			    var server_ip = "";
 			    var spinner = $("div#loading-spinner");
 			    var error = $("section#error");
+
+                if(typeof(EventSource) !== "undefined") {
+                    var source = new EventSource("api?action=listen");
+                    source.onmessage = function(event) {
+                        $("div#chat-main").append('<div class="chat-message">'+event.data+'</div>');
+                    };
+                }
+
 			    $("a.error-close").on("click", function(){
 			       error.fadeOut("fast");
 			    });

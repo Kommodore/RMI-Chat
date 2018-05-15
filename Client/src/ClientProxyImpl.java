@@ -68,7 +68,7 @@ public class ClientProxyImpl extends UnicastRemoteObject implements ClientProxy,
 			String message1234 = chatWindow.getChatMsg();
 			try {
 				if(irgendwas != null){
-					irgendwas.sendMessage("<" + myUsername + ">: "+message1234);
+					irgendwas.sendMessage(myUsername + ": "+message1234);
 				} else {
 					System.out.println("Nullpointer");
 				}

@@ -1,4 +1,3 @@
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.MalformedURLException;
@@ -10,7 +9,7 @@ import java.rmi.server.UnicastRemoteObject;
 public class ClientProxyImpl extends UnicastRemoteObject implements ClientProxy {
 	ChatServer stub;
 	
-	PropertyChangeSupport pcs;
+	private PropertyChangeSupport pcs;
 	
 	ClientProxyImpl() throws RemoteException {
 		pcs = new PropertyChangeSupport(this);
@@ -24,12 +23,12 @@ public class ClientProxyImpl extends UnicastRemoteObject implements ClientProxy 
 		}
 	}
 	
-	public void addPropertyChangeListener(PropertyChangeListener pcl) {
+	void addPropertyChangeListener(PropertyChangeListener pcl) {
 		pcs.addPropertyChangeListener(pcl);
 	}
 	
 	@Override
-	public void receiveMessage(String username, String message) throws RemoteException {
+	public void receiveMessage(String username, String message) {
 		pcs.firePropertyChange("msg", "", message);
 	}
 
