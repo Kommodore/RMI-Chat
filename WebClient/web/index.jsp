@@ -64,8 +64,6 @@
 			       server_ip = $("input#server").val();
                    $("section#login :input").attr("disabled", true);
 				   spinner.fadeIn("fast");
-				   console.log("Username: "+username);
-				   console.log("Server IP: "+server_ip);
 			       $.post('/api', {
 			           action: "subscribe",
 				       username: username,

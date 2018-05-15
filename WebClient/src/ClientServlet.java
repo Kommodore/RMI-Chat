@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 @WebServlet(name = "ClientServlet")
-public class ClientServlet extends HttpServlet implements ClientProxy{
+public class ClientServlet extends HttpServlet{
 	private ChatProxy proxyObject = null;
 	private ClientProxyImpl client;
 	private String username = "";
@@ -48,7 +48,7 @@ public class ClientServlet extends HttpServlet implements ClientProxy{
 		if(action.equals("send_message")){
 			if(proxyObject != null){
 				try{
-					proxyObject.sendMessage(request.getParameter("message"));
+					proxyObject.sendMessage("<" + username + ">: "+request.getParameter("message"));
 				} catch(RemoteException e1){
 					e1.printStackTrace();
 					response.sendError(420);
@@ -59,11 +59,6 @@ public class ClientServlet extends HttpServlet implements ClientProxy{
 				response.sendError(401);
 			}
 		}
-	}
-	
-	@Override
-	public void receiveMessage(String username, String message) throws RemoteException {
-	
 	}
 	
 	@Override
