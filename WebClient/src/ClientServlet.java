@@ -3,11 +3,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
 @WebServlet(name = "ClientServlet")
-public class ClientServlet extends HttpServlet{
+public class ClientServlet extends HttpServlet implements PropertyChangeListener{
 	private ChatProxy proxyObject = null;
 	private ClientProxyImpl client;
 	private String username = "";
@@ -62,10 +66,16 @@ public class ClientServlet extends HttpServlet{
 	}
 	
 	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		System.out.println("" + evt.getNewValue());
+	}
+	
+	@Override
 	public void init() throws ServletException {
 		super.init();
 		try {
 			client = new ClientProxyImpl();
+			client.addPropertyChangeListener(this);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
