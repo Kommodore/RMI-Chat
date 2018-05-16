@@ -66,6 +66,12 @@
 			       error.fadeOut("fast");
 			    });
 
+                <%
+					if(!session.isNew() && session.getAttribute("server_ip") != null && session.getAttribute("username") != null){
+						out.println("username = \""+session.getAttribute("username")+"\"; server_ip = \""+session.getAttribute("server_ip")+"\"; $(\"section#login :input\").attr(\"disabled\", true); spinner.fadeIn(\"fast\"); $.post('/api', { action: \"subscribe\", username: username, server_ip: server_ip }).done(function(){ $(\".my-username\").text(username); $(\".server-ip\").text(server_ip); $(\"section#login\").fadeOut(\"fast\"); $(\"section#chat\").fadeIn(\"fast\", function(){ spinner.fadeOut(\"fast\"); }); }).fail(function(xhr){ console.log(\"Error while connecting: \"+JSON.stringify(xhr)); $(\"section#login :input\").attr(\"disabled\", false); $(\".error-message\").text(\"Error while connecting to the server: \"+xhr.status); error.fadeIn(\"fast\"); spinner.fadeOut(\"fast\"); });");
+					}
+				%>
+
 			   $("#login-form").on("submit", function(event){
 			       event.preventDefault();
 			       username = $("section#login input#username").val();

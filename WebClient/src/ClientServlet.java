@@ -29,6 +29,9 @@ public class ClientServlet extends HttpServlet implements PropertyChangeListener
 				client.connect(request.getParameter("server_ip"));
 				username = request.getParameter("username");
 				proxyObject = client.stub.subscribeUser(username, client);
+				request.getSession().setAttribute("server_ip", request.getParameter("server_ip"));
+				request.getSession().setAttribute("username", request.getParameter("username"));
+				request.getSession().setMaxInactiveInterval(-1);
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 				response.sendError(403);
@@ -46,6 +49,8 @@ public class ClientServlet extends HttpServlet implements PropertyChangeListener
 					client.stub.unsubscribeUser(username);
 					proxyObject = null;
 					System.out.println("User unsubscribed");
+					request.getSession().removeAttribute("server_ip");
+					request.getSession().removeAttribute("username");
 				} catch(RemoteException e1){
 					e1.printStackTrace();
 					response.sendError(500);
@@ -97,7 +102,6 @@ public class ClientServlet extends HttpServlet implements PropertyChangeListener
 	public void propertyChange(PropertyChangeEvent evt) {
 		System.out.println("Sending message to clients: "+evt.getNewValue());
 		for(AsyncContext asyncContext: contexts){
-			System.out.println("Drinne");
 			PrintWriter writer;
 			try {
 				writer = asyncContext.getResponse().getWriter();
