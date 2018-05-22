@@ -29,7 +29,8 @@ public class ClientProxyImpl extends UnicastRemoteObject implements ClientProxy 
 	
 	@Override
 	public void receiveMessage(String username, String message) {
-		pcs.firePropertyChange("msg", "", message);
+		
+		pcs.firePropertyChange("msg", "", new Message(username, message));
 	}
 
 }

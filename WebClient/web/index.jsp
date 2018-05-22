@@ -54,13 +54,7 @@
 			    var server_ip = "";
 			    var spinner = $("div#loading-spinner");
 			    var error = $("section#error");
-
-                if(typeof(EventSource) !== "undefined") {
-                    var source = new EventSource("api?action=listen");
-                    source.onmessage = function(event) {
-                        $("div#chat-main").append('<div class="chat-message client">'+event.data+'</div>');
-                    };
-                }
+			    var source;
 
 			    $("a.error-close").on("click", function(){
 			       error.fadeOut("fast");
@@ -68,7 +62,7 @@
 
                 <%
 					if(!session.isNew() && session.getAttribute("server_ip") != null && session.getAttribute("username") != null){
-						out.println("username = \""+session.getAttribute("username")+"\"; server_ip = \""+session.getAttribute("server_ip")+"\"; $(\"section#login :input\").attr(\"disabled\", true); spinner.fadeIn(\"fast\"); $.post('/api', { action: \"subscribe\", username: username, server_ip: server_ip }).done(function(){ $(\".my-username\").text(username); $(\".server-ip\").text(server_ip); $(\"section#login\").fadeOut(\"fast\"); $(\"section#chat\").fadeIn(\"fast\", function(){ spinner.fadeOut(\"fast\"); }); }).fail(function(xhr){ console.log(\"Error while connecting: \"+JSON.stringify(xhr)); $(\"section#login :input\").attr(\"disabled\", false); $(\".error-message\").text(\"Error while connecting to the server: \"+xhr.status); error.fadeIn(\"fast\"); spinner.fadeOut(\"fast\"); });");
+						out.println("username = \""+session.getAttribute("username")+"\"; server_ip = \""+session.getAttribute("server_ip")+"\"; $(\"section#login :input\").attr(\"disabled\", true); spinner.fadeIn(\"fast\"); $.post('/api', { action: \"subscribe\", username: username, server_ip: server_ip }).done(function(){ $(\".my-username\").text(username); $(\".server-ip\").text(server_ip); $(\"section#login\").fadeOut(\"fast\"); $(\"section#chat\").fadeIn(\"fast\", function(){ spinner.fadeOut(\"fast\"); }); }).fail(function(xhr){ console.log(\"Error while connecting: \"+JSON.stringify(xhr)); $(\"section#login :input\").attr(\"disabled\", false); $(\".error-message\").text(\"Error while connecting to the server: \"+xhr.status); error.fadeIn(\"fast\"); spinner.fadeOut(\"fast\"); }); if(typeof(EventSource) !== \"undefined\") { source = new EventSource(\"api?action=listen\"); source.onmessage = function(event) { $(\"div#chat-main\").append('<div class=\"chat-message client\">'+event.data+'</div>'); }; }");
 					}
 				%>
 
@@ -89,6 +83,13 @@
 			           $("section#chat").fadeIn("fast", function(){
                            spinner.fadeOut("fast");
 			           });
+
+                       if(typeof(EventSource) !== "undefined") {
+                           source = new EventSource("api?action=listen");
+                           source.onmessage = function(event) {
+                               $("div#chat-main").append('<div class="chat-message client">'+event.data+'</div>');
+                           };
+                       }
 			       }).fail(function(xhr){
 			           console.log("Error while connecting: "+JSON.stringify(xhr));
                        $("section#login :input").attr("disabled", false);
@@ -109,6 +110,9 @@
                        $("section#login").fadeIn("fast", function(){
                            spinner.fadeOut("fast");
                        });
+                       if(typeof(EventSource) !== "undefined") {
+                           source.close();
+                       }
                    }).fail(function(xhr){
                        console.log("Error while disconnecting: "+JSON.stringify(xhr));
                        $(".error-message").text("Error while disconnecting from the server: "+xhr.status);
