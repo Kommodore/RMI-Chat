@@ -58,7 +58,7 @@
                 if(typeof(EventSource) !== "undefined") {
                     var source = new EventSource("api?action=listen");
                     source.onmessage = function(event) {
-                        $("div#chat-main").append('<div class="chat-message">'+event.data+'</div>');
+                        $("div#chat-main").append('<div class="chat-message client">'+event.data+'</div>');
                     };
                 }
 
@@ -103,6 +103,7 @@
 			           action: "unsubscribe"
 			       }).done(function(){
                        $("section#chat").fadeOut("fast");
+                       $("#chat-main > div.chat-message.client").remove();
                        $('section#login input[type="text"]').val("");
                        $("section#login :input").attr("disabled", false);
                        $("section#login").fadeIn("fast", function(){
