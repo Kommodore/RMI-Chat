@@ -1,5 +1,4 @@
 import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,24 +14,29 @@ import java.util.HashMap;
 @WebServlet(name = "ClientServlet")
 public class ClientServlet extends HttpServlet implements PropertyChangeListener{
 	
-	private ChatProxy proxyObject = null;
-	private ClientProxyImpl chatServer;
-	private HashMap<String, AsyncContext> eventSources = new HashMap<>();
+	private HashMap<String, Client> clients = new HashMap<>();
 	private static int i = 0;
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String action = request.getParameter("action");
+		String username;
+		try{
+			username = getUsername(request);
+		} catch(NullPointerException e){
+			username = request.getParameter("username");
+		}
+		
 		response.setStatus(200);
 		
 		if(action.equals("subscribe")){
+			username = request.getParameter("username");
+			Client newClient;
 			try {
-				chatServer.connect(request.getParameter("server_ip"));
-				if(eventSources.size() == 0){
-					proxyObject = chatServer.stub.subscribeUser(request.getParameter("username"), chatServer);
-				} else {
-					chatServer.stub.subscribeUser(request.getParameter("username"), chatServer);
-				}
-				System.out.println("User "+request.getParameter("username")+" subscribed");
+				newClient = new Client();
+				newClient.connect(request.getParameter("server_ip"), username);
+				newClient.getChatServer().addPropertyChangeListener(this);
+				clients.put(username, newClient);
+				System.out.println("User "+username+" subscribed");
 				
 				request.getSession().setAttribute("server_ip", request.getParameter("server_ip"));
 				request.getSession().setAttribute("username", request.getParameter("username"));
@@ -47,17 +51,12 @@ public class ClientServlet extends HttpServlet implements PropertyChangeListener
 		}
 		
 		if(action.equals("unsubscribe")){
-			if(chatServer.stub == null){
+			if(clients.get(username).getChatServer().stub == null){
 				response.sendError(500);
 			} else {
 				try{
-					chatServer.stub.unsubscribeUser(getUsername(request));
-					eventSources.remove(getUsername(request));
-					
-					if(eventSources.size() == 0){
-						System.out.println("proxyObject destroyed as no clients are existing anymore");
-						proxyObject = null;
-					}
+					clients.get(username).getChatServer().stub.unsubscribeUser(username);
+					clients.remove(username);
 					
 					System.out.println("User "+getUsername(request)+" unsubscribed");
 					request.getSession().removeAttribute("server_ip");
@@ -72,14 +71,14 @@ public class ClientServlet extends HttpServlet implements PropertyChangeListener
 		
 		if(action.equals("send_message")){
 			System.out.println("User "+getUsername(request)+" is sending message: "+request.getParameter("message"));
-			if(proxyObject != null){
+			if(clients.get(username).getProxyObject() != null){
 				try{
-					proxyObject.sendMessage(getUsername(request) + ": "+request.getParameter("message"));
+					clients.get(username).getProxyObject().sendMessage(getUsername(request) + ": "+request.getParameter("message"));
 				} catch(RemoteException e1){
 					e1.printStackTrace();
 					response.sendError(420);
 				}
-			} else if(chatServer.stub == null) {
+			} else if(clients.get(username).getChatServer().stub == null) {
 				response.sendError(500);
 			} else {
 				response.sendError(401);
@@ -104,7 +103,7 @@ public class ClientServlet extends HttpServlet implements PropertyChangeListener
 			asyncContext.setTimeout(0);
 			
 			//add context to list for later use
-			eventSources.put(getUsername(request), asyncContext);
+			clients.get(getUsername(request)).setNewMessagesRequest(asyncContext);
 			System.out.println("Registered async event source");
 		} else {
 			System.out.println("Unknown");
@@ -117,31 +116,23 @@ public class ClientServlet extends HttpServlet implements PropertyChangeListener
 		
 		System.out.println("Sending message \""+message.getMessage()+"\n to "+message.getUsername());
 		
-		AsyncContext asyncContext = eventSources.get(message.getUsername());
+		AsyncContext asyncContext = clients.get(message.getUsername()).getNewMessagesRequest();
 		PrintWriter writer;
-		try {
-			writer = asyncContext.getResponse().getWriter();
-			sendMessage(writer, message);
-		} catch (IOException e) {
-			e.printStackTrace();
+		
+		if(asyncContext != null){
 			try {
 				writer = asyncContext.getResponse().getWriter();
 				sendMessage(writer, message);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				eventSources.remove(message.getUsername());
+			} catch (IOException e) {
+				e.printStackTrace();
+				try {
+					writer = asyncContext.getResponse().getWriter();
+					sendMessage(writer, message);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					clients.get(message.getUsername()).setNewMessagesRequest(null);
+				}
 			}
-		}
-	}
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		try {
-			chatServer = new ClientProxyImpl();
-			chatServer.addPropertyChangeListener(this);
-		} catch (RemoteException e) {
-			e.printStackTrace();
 		}
 	}
 	
